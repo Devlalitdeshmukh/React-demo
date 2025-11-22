@@ -6,6 +6,7 @@ function AddCardForm({ show, onClose, onAdd, editCard, onUpdate }) {
   const [price, setPrice] = useState(editCard ? editCard.price : "");
   const [desc, setDesc] = useState(editCard ? editCard.desc : "");
   const [image, setImage] = useState(editCard ? editCard.image : "");
+  const [quantity, setQuantity] = useState(editCard ? editCard.quantity || 0 : 0); // Add quantity state
 
   // Reset form fields when editCard changes
   React.useEffect(() => {
@@ -14,11 +15,13 @@ function AddCardForm({ show, onClose, onAdd, editCard, onUpdate }) {
       setPrice(editCard.price);
       setDesc(editCard.desc);
       setImage(editCard.image || "");
+      setQuantity(editCard.quantity || 0); // Set quantity when editing
     } else {
       setTitle("");
       setPrice("");
       setDesc("");
       setImage("");
+      setQuantity(0);
     }
   }, [editCard]);
 
@@ -29,14 +32,15 @@ function AddCardForm({ show, onClose, onAdd, editCard, onUpdate }) {
       return;
     }
     if (editCard) {
-      onUpdate({ id: editCard.id, title, price, desc, image });
+      onUpdate({ id: editCard.id, title, price, desc, image, quantity }); // Include quantity in update
     } else {
-      onAdd({ title, price, desc, image });
+      onAdd({ title, price, desc, image, quantity }); // Include quantity in add
     }
     setTitle("");
     setPrice("");
     setDesc("");
     setImage("");
+    setQuantity(0);
     onClose();
   };
 
@@ -100,6 +104,20 @@ function AddCardForm({ show, onClose, onAdd, editCard, onUpdate }) {
                   onChange={(e) => setDesc(e.target.value)}
                   required
                 ></textarea>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="quantityInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
+                  Quantity
+                </label>
+                <input
+                  id="quantityInput"
+                  type="number"
+                  className="form-control"
+                  value={quantity}
+                  onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                  min="0"
+                  required
+                />
               </div>
               <div className="mb-3">
                 <label htmlFor="imageInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>

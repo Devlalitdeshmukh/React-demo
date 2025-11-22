@@ -7,7 +7,8 @@ function UserForm({ show, onClose, onAdd, onUpdate, editUser }) {
     phone: '',
     address: '',
     country: '',
-    image: ''
+    image: '',
+    status: 'Active' // Add status field
   });
 
   const [errors, setErrors] = useState({});
@@ -21,7 +22,8 @@ function UserForm({ show, onClose, onAdd, onUpdate, editUser }) {
         phone: editUser.phone || '',
         address: editUser.address || '',
         country: editUser.country || '',
-        image: editUser.image || ''
+        image: editUser.image || '',
+        status: editUser.status || 'Active' // Include status
       });
     } else {
       setUser({
@@ -30,7 +32,8 @@ function UserForm({ show, onClose, onAdd, onUpdate, editUser }) {
         phone: '',
         address: '',
         country: '',
-        image: ''
+        image: '',
+        status: 'Active' // Default status for new users
       });
     }
     setErrors({});
@@ -178,6 +181,21 @@ function UserForm({ show, onClose, onAdd, onUpdate, editUser }) {
                   placeholder="Enter country"
                 />
                 {errors.country && <div className="invalid-feedback">{errors.country}</div>}
+              </div>
+              
+              <div className="mb-3">
+                <label className="form-label" style={{ textAlign: 'left', display: 'block' }}>
+                  Status
+                </label>
+                <select
+                  className="form-select"
+                  name="status"
+                  value={user.status}
+                  onChange={handleInputChange}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
               </div>
             </form>
           </div>

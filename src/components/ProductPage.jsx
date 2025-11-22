@@ -5,14 +5,14 @@ import CustomConfirmModal from './CustomConfirmModal';
 import Checkout from './Checkout';
 
 function ProductPage({ cards, setCards, toastMessage, setToastMessage, users }) {
+  const [showAddCardForm, setShowAddCardForm] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [cart, setCart] = useState([]);
+  const [showCheckout, setShowCheckout] = useState(false);
   const [isCardView, setIsCardView] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [cardToDelete, setCardToDelete] = useState(null);
-  const [cart, setCart] = useState([]);
-  const [showCheckout, setShowCheckout] = useState(false);
   
   // Individual column search terms
   const [titleSearch, setTitleSearch] = useState("");
@@ -35,7 +35,7 @@ function ProductPage({ cards, setCards, toastMessage, setToastMessage, users }) 
       // Clear editing card if deleted
       if (editingCard && editingCard.id === cardToDelete) {
         setEditingCard(null);
-        setShowAddForm(false);
+        setShowAddCardForm(false);
       }
       // Close modal and reset card to delete
       setShowDeleteModal(false);
@@ -50,7 +50,7 @@ function ProductPage({ cards, setCards, toastMessage, setToastMessage, users }) 
 
   const handleEditCard = (card) => {
     setEditingCard(card);
-    setShowAddForm(true);
+    setShowAddCardForm(true);
   };
 
   const handleAddCard = (newCard) => {
@@ -166,12 +166,36 @@ function ProductPage({ cards, setCards, toastMessage, setToastMessage, users }) 
     setCurrentPage(1);
   };
 
+  const exportToCSV = (data, filename) => {
+    const csvContent = [
+      Object.keys(data[0]).join(','),
+      ...data.map(item => Object.values(item).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportProducts = () => {
+    exportToCSV(cards, 'products.csv');
+  };
+
   return (
     <div className="container my-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Product Management</h2>
         <div className="d-flex gap-2">
-          <button className="btn btn-primary" onClick={() => { setShowAddForm(true); setEditingCard(null); }}>
+          <button className="btn btn-success" onClick={handleExportProducts}>
+            Export CSV
+          </button>
+          <button className="btn btn-primary" onClick={() => { setShowAddCardForm(true); setEditingCard(null); }}>
             Add New Product
           </button>
           {cart.length > 0 && (
@@ -329,9 +353,9 @@ function ProductPage({ cards, setCards, toastMessage, setToastMessage, users }) 
       )}
 
       <AddCardForm
-        show={showAddForm}
+        show={showAddCardForm}
         onClose={() => {
-          setShowAddForm(false);
+          setShowAddCardForm(false);
           setEditingCard(null);
         }}
         onAdd={handleAddCard}

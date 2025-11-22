@@ -21,15 +21,41 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Filter users based on search terms
+  const filteredUsers = users.filter(user => {
+    const matchesGlobalSearch = Object.values(user).some(value =>
+      String(value).toLowerCase().includes(String(searchTerm).toLowerCase())
+    );
+    
+    const matchesName = user.name.toLowerCase().includes(nameSearch.toLowerCase());
+    const matchesEmail = user.email.toLowerCase().includes(emailSearch.toLowerCase());
+    const matchesPhone = user.phone.toLowerCase().includes(phoneSearch.toLowerCase());
+    const matchesAddress = user.address.toLowerCase().includes(addressSearch.toLowerCase());
+    const matchesCountry = user.country.toLowerCase().includes(countrySearch.toLowerCase());
+    
+    if (searchTerm) {
+      return matchesGlobalSearch;
+    } else {
+      return matchesName && matchesEmail && matchesPhone && matchesAddress && matchesCountry;
+    }
+  });
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+
   const handleAddUser = (newUser) => {
     const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-    setUsers(prev => [...prev, { id: newId, ...newUser }]);
+    const userWithStatus = { ...newUser, id: newId, status: 'Active' }; // Add status
+    setUsers(prev => [...prev, userWithStatus]);
     setToastMessage("User added successfully.");
     setShowUserForm(false);
   };
 
   const handleUpdateUser = (updatedUser) => {
-    // Make sure the updatedUser has all the required fields including image
+    console.log("Updating user with data:", updatedUser);
     setUsers(prev =>
       prev.map(user => (user.id === updatedUser.id ? { ...user, ...updatedUser } : user))
     );
@@ -59,34 +85,21 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
   };
 
   const handleEditUser = (user) => {
+    console.log("Editing user:", user);
     setEditingUser(user);
     setShowUserForm(true);
   };
 
-  // Filter users based on search terms
-  const filteredUsers = users.filter(user => {
-    const matchesGlobalSearch = Object.values(user).some(value =>
-      String(value).toLowerCase().includes(String(searchTerm).toLowerCase())
+  const toggleUserStatus = (id) => {
+    setUsers(prev => 
+      prev.map(user => 
+        user.id === id 
+          ? { ...user, status: user.status === 'Active' ? 'Inactive' : 'Active' } 
+          : user
+      )
     );
-    
-    const matchesName = user.name.toLowerCase().includes(nameSearch.toLowerCase());
-    const matchesEmail = user.email.toLowerCase().includes(emailSearch.toLowerCase());
-    const matchesPhone = user.phone.toLowerCase().includes(phoneSearch.toLowerCase());
-    const matchesAddress = user.address.toLowerCase().includes(addressSearch.toLowerCase());
-    const matchesCountry = user.country.toLowerCase().includes(countrySearch.toLowerCase());
-    
-    if (searchTerm) {
-      return matchesGlobalSearch;
-    } else {
-      return matchesName && matchesEmail && matchesPhone && matchesAddress && matchesCountry;
-    }
-  });
-  
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+    setToastMessage("User status updated successfully.");
+  };
 
   // Reset to first page when search terms change
   const handleSearchChange = (term) => {
@@ -98,13 +111,45 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
     setCurrentPage(1);
   };
 
+  const exportToCSV = (data, filename) => {
+    // Add status to data if not present
+    const dataWithStatus = data.map(user => ({
+      ...user,
+      status: user.status || 'Active'
+    }));
+    
+    const csvContent = [
+      Object.keys(dataWithStatus[0]).join(','),
+      ...dataWithStatus.map(item => Object.values(item).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportUsers = () => {
+    exportToCSV(users, 'users.csv');
+  };
+
   return (
     <div className="container my-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>User Management</h2>
-        <button className="btn btn-primary" onClick={() => { setShowUserForm(true); setEditingUser(null); }}>
-          Add New User
-        </button>
+        <div className="d-flex gap-2">
+          <button className="btn btn-success" onClick={handleExportUsers}>
+            Export CSV
+          </button>
+          <button className="btn btn-primary" onClick={() => { setShowUserForm(true); setEditingUser(null); }}>
+            Add New User
+          </button>
+        </div>
       </div>
 
       <div className="mb-3 d-flex justify-content-between align-items-center">
@@ -217,21 +262,33 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
                   <p className="card-text" style={{ textAlign: 'left' }}>
                     <strong>Phone:</strong> {user.phone}<br />
                     <strong>Address:</strong> {user.address}<br />
-                    <strong>Country:</strong> {user.country}
+                    <strong>Country:</strong> {user.country}<br />
+                    <strong>Status:</strong> 
+                    <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
+                      {user.status || 'Active'}
+                    </span>
                   </p>
-                  <div className="d-flex justify-content-end">
+                  <div className="d-flex justify-content-between">
                     <button
-                      className="btn btn-sm btn-warning me-2"
-                      onClick={() => handleEditUser(user)}
+                      className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
+                      onClick={() => toggleUserStatus(user.id)}
                     >
-                      Edit
+                      {user.status === 'Active' ? 'Deactivate' : 'Activate'}
                     </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Delete
-                    </button>
+                    <div>
+                      <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -249,6 +306,7 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
                 <th>Phone</th>
                 <th>Address</th>
                 <th>Country</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -261,18 +319,31 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
                   <td>{user.address}</td>
                   <td>{user.country}</td>
                   <td>
-                    <button
-                      className="btn btn-sm btn-warning me-2"
-                      onClick={() => handleEditUser(user)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Delete
-                    </button>
+                    <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
+                      {user.status || 'Active'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="btn-group" role="group">
+                      <button
+                        className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
+                        onClick={() => toggleUserStatus(user.id)}
+                      >
+                        {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        className="btn btn-sm btn-warning me-2"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

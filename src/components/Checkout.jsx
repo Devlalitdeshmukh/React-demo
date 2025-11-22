@@ -100,16 +100,20 @@ function Checkout({ cart, getTotalCartPrice, onCheckoutComplete, onCancel, users
   const handleGenerateInvoice = () => {
     if (validateForm()) {
       // Generate invoice
+      const invoiceItems = editableItems.map(item => ({
+        ...item,
+        totalPrice: (item.editablePrice * item.editableCount).toFixed(2)
+      }));
+      
+      const totalAmount = invoiceItems.reduce((total, item) => 
+        total + (item.editablePrice * item.editableCount), 0).toFixed(2);
+      
       const newInvoice = {
         id: `INV-${Date.now()}`,
         date: new Date().toLocaleDateString(),
         user: { ...user },
-        items: editableItems.map(item => ({
-          ...item,
-          totalPrice: (item.editablePrice * item.editableCount).toFixed(2)
-        })),
-        totalAmount: editableItems.reduce((total, item) => 
-          total + (item.editablePrice * item.editableCount), 0).toFixed(2)
+        items: invoiceItems,
+        totalAmount: totalAmount
       };
       
       setInvoice(newInvoice);
@@ -158,13 +162,111 @@ Total Amount: $${invoice.totalAmount}
     URL.revokeObjectURL(url);
   };
 
+  const downloadInvoicePDF = () => {
+    if (!invoice) return;
+    
+    // Create HTML content for PDF
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Invoice ${invoice.id}</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .invoice-title { font-size: 24px; font-weight: bold; }
+            .invoice-info { margin: 20px 0; }
+            .bill-to { text-align: left; margin: 20px 0; }
+            .bill-to h3 { margin-bottom: 10px; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .total-section { margin-top: 30px; text-align: right; }
+            .total-row { font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="invoice-title">INVOICE</div>
+            <div>Invoice ID: ${invoice.id}</div>
+            <div>Date: ${invoice.date}</div>
+          </div>
+          
+          <div class="bill-to">
+            <h3>Bill To:</h3>
+            <div><strong>Name:</strong> ${invoice.user.name}</div>
+            <div><strong>Email:</strong> ${invoice.user.email}</div>
+            <div><strong>Phone:</strong> ${invoice.user.phone}</div>
+            <div><strong>Address:</strong> ${invoice.user.address}</div>
+            <div><strong>Country:</strong> ${invoice.user.country}</div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Item Description</th>
+                <th class="text-right">Unit Price</th>
+                <th class="text-center">Quantity</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${invoice.items.map((item, index) => `
+                <tr>
+                  <td class="text-center">${index + 1}</td>
+                  <td>${item.product.title}</td>
+                  <td class="text-right">$${parseFloat(item.editablePrice).toFixed(2)}</td>
+                  <td class="text-center">${item.editableCount}</td>
+                  <td class="text-right">$${(item.editablePrice * item.editableCount).toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          
+          <div class="total-section">
+            <div><strong>Subtotal:</strong> $${invoice.totalAmount}</div>
+            <div><strong>Tax (0%):</strong> $0.00</div>
+            <div class="total-row"><strong>Total: $${invoice.totalAmount}</strong></div>
+          </div>
+          
+          <div style="margin-top: 40px; text-align: center; color: #666;">
+            Thank you for your business!
+          </div>
+        </body>
+      </html>
+    `;
+    
+    // Open in new window for printing/saving as PDF
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Wait a bit for content to load then trigger print
+    setTimeout(() => {
+      printWindow.print();
+    }, 500);
+  };
+
   // Handle editable item changes
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...editableItems];
-    updatedItems[index] = {
-      ...updatedItems[index],
-      [field]: field === 'editableCount' || field === 'editablePrice' ? parseFloat(value) || 0 : value
-    };
+    const numericValue = field === 'editableCount' || field === 'editablePrice' ? parseFloat(value) || 0 : value;
+    
+    // Ensure count is at least 1
+    if (field === 'editableCount' && numericValue < 1) {
+      updatedItems[index] = {
+        ...updatedItems[index],
+        [field]: 1
+      };
+    } else {
+      updatedItems[index] = {
+        ...updatedItems[index],
+        [field]: numericValue
+      };
+    }
     setEditableItems(updatedItems);
   };
 
@@ -182,42 +284,53 @@ Total Amount: $${invoice.totalAmount}
               <div className="container-fluid">
                 <div className="row">
                   <div className="col-12 text-center mb-4">
-                    <h3>INVOICE</h3>
-                    <p className="mb-1"><strong>Invoice ID:</strong> {invoice.id}</p>
-                    <p><strong>Date:</strong> {invoice.date}</p>
+                    <h2 className="display-6">INVOICE</h2>
+                    <hr />
+                    <div className="row">
+                      <div className="col-6 text-start">
+                        <p className="mb-1"><strong>Invoice ID:</strong> {invoice.id}</p>
+                        <p><strong>Date:</strong> {invoice.date}</p>
+                      </div>
+                      <div className="col-6 text-end">
+                        <h4>Vendor Portal</h4>
+                        <p className="text-muted">MRS Holdings</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="row">
+                <div className="row mb-4">
                   <div className="col-6">
-                    <h5>Customer Information</h5>
-                    <p className="mb-1"><strong>Name:</strong> {invoice.user.name}</p>
-                    <p className="mb-1"><strong>Email:</strong> {invoice.user.email}</p>
-                    <p className="mb-1"><strong>Phone:</strong> {invoice.user.phone}</p>
-                    <p className="mb-1"><strong>Address:</strong> {invoice.user.address}</p>
-                    <p><strong>Country:</strong> {invoice.user.country}</p>
+                    <h5 className="border-bottom pb-2">Bill To:</h5>
+                    <p className="mb-1 text-start"><strong>Name:</strong> {invoice.user.name}</p>
+                    <p className="mb-1 text-start"><strong>Email:</strong> {invoice.user.email}</p>
+                    <p className="mb-1 text-start"><strong>Phone:</strong> {invoice.user.phone}</p>
+                    <p className="mb-1 text-start"><strong>Address:</strong> {invoice.user.address}</p>
+                    <p className="text-start"><strong>Country:</strong> {invoice.user.country}</p>
                   </div>
                 </div>
                 
                 <div className="row mt-4">
                   <div className="col-12">
-                    <h5>Items</h5>
-                    <table className="table table-striped">
-                      <thead>
+                    <h5 className="border-bottom pb-2">Items</h5>
+                    <table className="table table-bordered">
+                      <thead className="table-light">
                         <tr>
-                          <th>Item</th>
-                          <th>Price</th>
-                          <th>Quantity</th>
-                          <th>Total</th>
+                          <th className="text-center">#</th>
+                          <th>Item Description</th>
+                          <th className="text-end">Unit Price</th>
+                          <th className="text-center">Quantity</th>
+                          <th className="text-end">Total</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {invoice.items.map(item => (
+                        {invoice.items.map((item, index) => (
                           <tr key={item.product.id}>
+                            <td className="text-center">{index + 1}</td>
                             <td>{item.product.title}</td>
-                            <td>${parseFloat(item.editablePrice).toFixed(2)}</td>
-                            <td>{item.editableCount}</td>
-                            <td>${(item.editablePrice * item.editableCount).toFixed(2)}</td>
+                            <td className="text-end">${parseFloat(item.editablePrice).toFixed(2)}</td>
+                            <td className="text-center">{item.editableCount}</td>
+                            <td className="text-end">${(item.editablePrice * item.editableCount).toFixed(2)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -227,7 +340,32 @@ Total Amount: $${invoice.totalAmount}
                 
                 <div className="row">
                   <div className="col-12 text-end">
-                    <h4><strong>Total Amount: ${invoice.totalAmount}</strong></h4>
+                    <div className="row justify-content-end">
+                      <div className="col-6 col-md-4">
+                        <table className="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td><strong>Subtotal:</strong></td>
+                              <td className="text-end">${invoice.totalAmount}</td>
+                            </tr>
+                            <tr>
+                              <td><strong>Tax (0%):</strong></td>
+                              <td className="text-end">$0.00</td>
+                            </tr>
+                            <tr className="border-top">
+                              <td><h5><strong>Total:</strong></h5></td>
+                              <td className="text-end"><h5><strong>${invoice.totalAmount}</strong></h5></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="row mt-4">
+                  <div className="col-12 text-center">
+                    <p className="text-muted">Thank you for your business!</p>
                   </div>
                 </div>
               </div>
@@ -236,8 +374,11 @@ Total Amount: $${invoice.totalAmount}
               <button type="button" className="btn btn-secondary" onClick={() => setShowInvoicePreview(false)}>
                 Back to Form
               </button>
-              <button type="button" className="btn btn-success" onClick={downloadInvoice}>
-                Download Invoice
+              <button type="button" className="btn btn-info" onClick={downloadInvoice}>
+                Download as Text
+              </button>
+              <button type="button" className="btn btn-success" onClick={downloadInvoicePDF}>
+                Download as PDF
               </button>
               <button type="button" className="btn btn-primary" onClick={handleConfirmCheckout}>
                 Confirm Checkout
@@ -359,52 +500,53 @@ Total Amount: $${invoice.totalAmount}
               <div className="col-md-6">
                 <h5>Order Summary</h5>
                 <div className="border rounded p-3">
-                  {editableItems.map((item, index) => (
-                    <div key={item.product.id} className="mb-3 p-2 border rounded">
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <div>{item.product.title}</div>
-                      </div>
-                      <div className="d-flex align-items-center">
-                        <div className="me-3">
-                          <label className="form-label small" style={{ textAlign: 'left', display: 'block' }}>
-                            Price
-                          </label>
-                          <input
-                            type="number"
-                            className="form-control form-control-sm"
-                            value={item.editablePrice}
-                            onChange={(e) => handleItemChange(index, 'editablePrice', e.target.value)}
-                            step="0.01"
-                            min="0"
-                          />
-                        </div>
-                        <div className="me-3">
-                          <label className="form-label small" style={{ textAlign: 'left', display: 'block' }}>
-                            Qty
-                          </label>
-                          <input
-                            type="number"
-                            className="form-control form-control-sm"
-                            value={item.editableCount}
-                            onChange={(e) => handleItemChange(index, 'editableCount', e.target.value)}
-                            min="1"
-                          />
-                        </div>
-                        <div>
-                          <label className="form-label small" style={{ textAlign: 'left', display: 'block' }}>
-                            Total
-                          </label>
-                          <div>${(item.editablePrice * item.editableCount).toFixed(2)}</div>
-                        </div>
+                  <table className="table table-bordered">
+                    <thead className="table-light">
+                      <tr>
+                        <th>Item</th>
+                        <th className="text-end">Price</th>
+                        <th className="text-center">Qty</th>
+                        <th className="text-end">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {editableItems.map((item, index) => (
+                        <tr key={item.product.id}>
+                          <td>{item.product.title}</td>
+                          <td className="text-end">
+                            <input
+                              type="number"
+                              className="form-control form-control-sm text-end"
+                              value={item.editablePrice}
+                              onChange={(e) => handleItemChange(index, 'editablePrice', e.target.value)}
+                              step="0.01"
+                              min="0"
+                              style={{ width: '80px', display: 'inline-block' }}
+                            />
+                          </td>
+                          <td className="text-center">
+                            <input
+                              type="number"
+                              className="form-control form-control-sm text-center"
+                              value={item.editableCount}
+                              onChange={(e) => handleItemChange(index, 'editableCount', e.target.value)}
+                              min="1"
+                              style={{ width: '70px', display: 'inline-block' }}
+                            />
+                          </td>
+                          <td className="text-end">${(item.editablePrice * item.editableCount).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  <div className="row mt-3">
+                    <div className="col-12">
+                      <div className="d-flex justify-content-end">
+                        <h5><strong>Total: ${editableItems.reduce((total, item) => 
+                          total + (item.editablePrice * item.editableCount), 0).toFixed(2)}</strong></h5>
                       </div>
                     </div>
-                  ))}
-                  
-                  <hr />
-                  <div className="d-flex justify-content-between">
-                    <strong>Total:</strong>
-                    <strong>${editableItems.reduce((total, item) => 
-                      total + (item.editablePrice * item.editableCount), 0).toFixed(2)}</strong>
                   </div>
                 </div>
               </div>

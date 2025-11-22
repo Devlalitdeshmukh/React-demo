@@ -1,11 +1,14 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import ProductPage from './components/ProductPage';
 import UserPage from './components/UserPage';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import AdminUserList from './components/AdminUserList';
 import React from 'react';
 
 function App() {
@@ -15,35 +18,40 @@ function App() {
       title: "LapTop",
       price: "$1200.00",
       desc: "Core i7, 16GB",
-      image: ""
+      image: "",
+      quantity: 5 // Add quantity field
     },
     {
       id: 2,
       title: "USB Hub",
       price: "$1800.00",
       desc: "8 in 1 USB-C Hub",
-      image: ""
+      image: "",
+      quantity: 0 // Out of stock
     },
     {
       id: 3,
       title: "Head Phone",
       price: "$99.00",
       desc: "JBL Wireless",
-      image: ""
+      image: "",
+      quantity: 10
     },
     {
       id: 4,
       title: "Smart Watch",
       price: "$299.00",
       desc: "Fitness Tracker with Heart Rate Monitor",
-      image: ""
+      image: "",
+      quantity: 3
     },
     {
       id: 5,
       title: "Bluetooth Speaker",
       price: "$79.99",
       desc: "Portable Wireless Speaker",
-      image: ""
+      image: "",
+      quantity: 5
     }
   ]);
 
@@ -56,7 +64,8 @@ function App() {
       phone: "254-476-5214",
       address: "142 Main St",
       country: "IND",
-      image: "https://i.pravatar.cc/150?img=2"
+      image: "https://i.pravatar.cc/150?img=2",
+      status: "Active"
     },
     {
       id: 2,
@@ -65,7 +74,8 @@ function App() {
       phone: "098-765-4321",
       address: "456 Oak Ave",
       country: "Canada",
-      image: "https://i.pravatar.cc/150?img=4"
+      image: "https://i.pravatar.cc/150?img=4",
+      status: "Active"
     }
     ,
     {
@@ -75,11 +85,48 @@ function App() {
       phone: "123-456-7890",
       address: "123 Main St",
       country: "USA",
-      image: "https://i.pravatar.cc/150?img=7"
+      image: "https://i.pravatar.cc/150?img=7",
+      status: "Inactive"
     }
   ]);
 
   const [toastMessage, setToastMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userCredentials, setUserCredentials] = useState([
+    { email: 'admin@example.com', password: 'admin123' } // Default admin credentials
+  ]);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Check if user is logged in from localStorage
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    const savedCredentials = localStorage.getItem('userCredentials');
+    
+    if (savedUser) {
+      try {
+        setCurrentUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error('Error parsing user data', e);
+      }
+    }
+    
+    if (savedCredentials) {
+      try {
+        const parsedCredentials = JSON.parse(savedCredentials);
+        // Merge with default credentials, avoiding duplicates
+        const defaultCred = { email: 'admin@example.com', password: 'admin123' };
+        const mergedCredentials = parsedCredentials.some(cred => cred.email === defaultCred.email) 
+          ? parsedCredentials 
+          : [defaultCred, ...parsedCredentials];
+        
+        setUserCredentials(mergedCredentials);
+      } catch (e) {
+        console.error('Error parsing credentials data', e);
+        // Fallback to default credentials
+        setUserCredentials([{ email: 'admin@example.com', password: 'admin123' }]);
+      }
+    }
+  }, []);
 
   // Auto-hide toast messages after 5 seconds
   useEffect(() => {
@@ -91,28 +138,127 @@ function App() {
     }
   }, [toastMessage]);
 
+  const handleLogin = (email, password) => {
+    // Check hardcoded admin credentials first
+    if (email === 'admin@example.com' && password === 'admin123') {
+      const adminUser = {
+        id: 1,
+        name: 'Admin User',
+        email: email,
+        role: 'admin'
+      };
+      setCurrentUser(adminUser);
+      localStorage.setItem('currentUser', JSON.stringify(adminUser));
+      return { success: true };
+    }
+    
+    // Check stored credentials
+    if (validateCredentials(email, password)) {
+      const user = {
+        id: Date.now(),
+        name: 'User', // In a real app, this would come from user data
+        email: email,
+        role: 'admin'
+      };
+      setCurrentUser(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      return { success: true };
+    }
+    
+    return { success: false, error: 'Invalid email or password' };
+  };
+
+  const handleSignup = (userData, password) => {
+    // Check if email already exists
+    if (userCredentials.some(cred => cred.email === userData.email)) {
+      console.log('User already exists:', userData.email);
+      return { success: false, error: 'User with this email already exists' };
+    }
+    
+    // Store user credentials
+    const newCredentials = {
+      email: userData.email,
+      password: password
+    };
+    
+    const updatedCredentials = [...userCredentials, newCredentials];
+    setUserCredentials(updatedCredentials);
+    localStorage.setItem('userCredentials', JSON.stringify(updatedCredentials));
+    
+    console.log('New user signed up:', userData);
+    return { success: true };
+  };
+
+  const validateCredentials = (email, password) => {
+    // Check if credentials exist
+    return userCredentials.some(cred => 
+      cred.email === email && cred.password === password
+    );
+  };
+
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+    setShowLogoutModal(false);
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  // Protected route component
+  const ProtectedRoute = ({ children }) => {
+    if (!currentUser) {
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
+
   return (
     <Router>
       <div className="App">
-        <Navigation />
+        {currentUser && <Navigation onLogout={handleLogout} currentUser={currentUser} />}
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={
+            currentUser ? <Navigate to="/products" replace /> : <Login onLogin={handleLogin} />
+          } />
+          <Route path="/signup" element={
+            currentUser ? <Navigate to="/products" replace /> : <Signup onSignup={handleSignup} />
+          } />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          } />
           <Route path="/products" element={
-            <ProductPage 
-              cards={cards} 
-              setCards={setCards} 
-              toastMessage={toastMessage} 
-              setToastMessage={setToastMessage} 
-              users={users}
-            />
+            <ProtectedRoute>
+              <ProductPage 
+                cards={cards} 
+                setCards={setCards} 
+                toastMessage={toastMessage} 
+                setToastMessage={setToastMessage} 
+                users={users}
+              />
+            </ProtectedRoute>
           } />
           <Route path="/users" element={
-            <UserPage 
-              users={users} 
-              setUsers={setUsers} 
-              toastMessage={toastMessage} 
-              setToastMessage={setToastMessage} 
-            />
+            <ProtectedRoute>
+              <UserPage 
+                users={users} 
+                setUsers={setUsers} 
+                toastMessage={toastMessage} 
+                setToastMessage={setToastMessage} 
+              />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin-users" element={
+            <ProtectedRoute>
+              <AdminUserList />
+            </ProtectedRoute>
           } />
         </Routes>
         
@@ -137,7 +283,32 @@ function App() {
             </div>
           </div>
         )}
-        <Footer companyName="MRS Holdings" />
+        {currentUser && <Footer companyName="MRS Holdings" />}
+        
+        {/* Logout Confirmation Modal */}
+        {showLogoutModal && (
+          <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title">Confirm Logout</h5>
+                  <button type="button" className="btn-close" onClick={cancelLogout}></button>
+                </div>
+                <div className="modal-body">
+                  <p>Are you sure you want to logout?</p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-secondary" onClick={cancelLogout}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-primary" onClick={confirmLogout}>
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Router>
   );

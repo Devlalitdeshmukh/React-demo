@@ -1,54 +1,30 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function HomePage() {
   const navigate = useNavigate();
+  
+  // For demo purposes, we'll automatically redirect to login
+  // In a real app, you might want to show a landing page
+  React.useEffect(() => {
+    navigate('/login');
+  }, [navigate]);
 
   return (
-    <div className="container my-4">
-      <div className="jumbotron bg-light p-5 rounded">
-        <h1 className="display-4">Welcome to Vendor Portal</h1>
-        <p className="lead">Manage your products and users efficiently with our comprehensive portal.</p>
-        <hr className="my-4" />
-        <div className="d-flex justify-content-center gap-3">
-          <button 
-            className="btn btn-primary btn-lg" 
-            onClick={() => navigate('/products')}
-          >
-            View Products
-          </button>
-          <button 
-            className="btn btn-info btn-lg" 
-            onClick={() => navigate('/users')}
-          >
-            View Users
-          </button>
-        </div>
-      </div>
-      
-      <div className="row mt-5">
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-body text-center">
-              <h5 className="card-title">Product Management</h5>
-              <p className="card-text">Add, edit, and manage your product catalog with ease.</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-body text-center">
-              <h5 className="card-title">User Management</h5>
-              <p className="card-text">Manage customer information and profiles efficiently.</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-body text-center">
-              <h5 className="card-title">Order Processing</h5>
-              <p className="card-text">Process orders and generate invoices seamlessly.</p>
-            </div>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-8 text-center">
+          <h1 className="display-4 mb-4">Welcome to Vendor Portal</h1>
+          <p className="lead mb-4">
+            Manage your products and users efficiently with our vendor portal.
+          </p>
+          <div className="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <Link to="/login" className="btn btn-primary btn-lg px-4 gap-3">
+              Login
+            </Link>
+            <Link to="/signup" className="btn btn-outline-secondary btn-lg px-4">
+              Sign Up
+            </Link>
           </div>
         </div>
       </div>
