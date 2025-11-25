@@ -1,0 +1,144 @@
+/* Dark mode overrides */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .card {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .card-header {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .card-footer {
+  background-color: #2d2d2d !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .table {
+  color: #ffffff !important;
+}
+
+body.dark-mode .table th,
+body.dark-mode .table td {
+  border-color: #333333 !important;
+}
+
+body.dark-mode .table-hover tbody tr:hover {
+  color: #ffffff !important;
+  background-color: #2d2d2d !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border-color: #666666 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
+}
+
+body.dark-mode .btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+}
+
+body.dark-mode .btn-outline-light {
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+body.dark-mode .btn-outline-light:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.dark-mode .dropdown-menu {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+}
+
+body.dark-mode .dropdown-item {
+  color: #ffffff !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+  background-color: #2d2d2d !important;
+}
+
+body.dark-mode .modal-content {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .modal-header {
+  border-color: #333333 !important;
+}
+
+body.dark-mode .modal-footer {
+  border-color: #333333 !important;
+}
+
+body.dark-mode .bg-light {
+  background-color: #2d2d2d !important;
+}
+
+body.dark-mode .text-muted {
+  color: #aaaaaa !important;
+}
+
+body.dark-mode .badge {
+  color: #ffffff !important;
+}
+
+body.dark-mode .nav-link {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active {
+  color: #ffffff !important;
+}
+
+body.dark-mode .navbar-dark .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Ensure all headings are left-aligned */
+h1, h2, h3, h4, h5, h6 {
+  text-align: left !important;
+}
+
+/* Ensure all form labels are left-aligned */
+label,
+.form-label {
+  text-align: left !important;
+}
+
+/* Dark mode specific heading and label alignment */
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode h5, 
+body.dark-mode h6 {
+  text-align: left !important;
+}
+
+body.dark-mode label,
+body.dark-mode .form-label {
+  text-align: left !important;
+}

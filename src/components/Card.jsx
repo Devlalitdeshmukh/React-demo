@@ -23,80 +23,90 @@ function Card({ card, onEdit, onDelete, onAddToCart }) {
   const isOutOfStock = card.quantity === 0;
 
   return (
-    <div className="card mb-4" style={{ width: '300px' }}>
+    <div className="card h-100 shadow-sm">
       {/* Product Image */}
-      <div style={{ 
-        height: '200px', 
-        backgroundColor: '#f8f9fa', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        borderBottom: '1px solid #dee2e6'
-      }}>
+      <div className="card-img-top d-flex align-items-center justify-content-center bg-light" 
+           style={{ height: '200px' }}>
         {card.image ? (
           <img 
             src={card.image} 
             alt={card.title} 
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'cover' 
-            }} 
+            className="img-fluid h-100" 
+            style={{ objectFit: 'cover' }} 
           />
         ) : (
-          <span style={{ fontSize: '3rem', color: '#6c757d' }}>
-            📷
-          </span>
+          <div className="text-center">
+            <i className="bi bi-image text-muted" style={{ fontSize: '3rem' }}></i>
+            <p className="text-muted mt-2 mb-0">No Image</p>
+          </div>
         )}
       </div>
       
-      <div className="card-body">
-        <h5 className="card-title">{card.title}</h5>
-        <p className="card-text">{card.desc}</p>
-        <p className="card-text">
-          <strong>Price: </strong>{card.price}
-        </p>
-        <p className="card-text">
-          <strong>Available: </strong>{card.quantity} {card.quantity === 1 ? 'item' : 'items'}
-        </p>
-        {/* Center-aligned increment/decrement section */}
-        <div className="d-flex justify-content-center align-items-center mb-3">
-          <button className="btn btn-sm btn-outline-secondary me-2" onClick={decrement} disabled={isOutOfStock}>-</button>
-          <span>{count}</span>
-          <button 
-            className="btn btn-sm btn-outline-primary ms-2" 
-            onClick={increment} 
-            disabled={isOutOfStock || count >= card.quantity}
-          >
-            +
-          </button>
+      <div className="card-body d-flex flex-column">
+        <h5 className="card-title text-start">{card.title}</h5>
+        <p className="card-text text-muted flex-grow-1 text-start">{card.desc}</p>
+        <div className="mb-3">
+          <div className="d-flex justify-content-between align-items-center">
+            <span className="h5 text-success mb-0 text-start">{card.price}</span>
+            <span className={`badge ${card.quantity > 0 ? 'bg-success' : 'bg-danger'}`}>
+              {card.quantity > 0 ? `${card.quantity} in stock` : 'Out of stock'}
+            </span>
+          </div>
         </div>
-        {isOutOfStock && (
-          <div className="alert alert-warning text-center py-2" role="alert">
-            <strong>Out of Stock</strong>
+        
+        {/* Quantity Selector */}
+        <div className="mb-3">
+          <label className="form-label small text-muted text-start">Quantity</label>
+          <div className="input-group">
+            <button 
+              className="btn btn-outline-secondary" 
+              type="button" 
+              onClick={decrement} 
+              disabled={isOutOfStock || count <= 0}
+            >
+              <i className="bi bi-dash"></i>
+            </button>
+            <input 
+              type="text" 
+              className="form-control text-center" 
+              value={count} 
+              readOnly 
+            />
+            <button 
+              className="btn btn-outline-secondary" 
+              type="button" 
+              onClick={increment} 
+              disabled={isOutOfStock || count >= card.quantity}
+            >
+              <i className="bi bi-plus"></i>
+            </button>
           </div>
-        )}
-        {count >= card.quantity && card.quantity > 0 && (
-          <div className="alert alert-info text-center py-2" role="alert">
-            <small>Max quantity reached</small>
+        </div>
+        
+        <div className="mt-auto">
+          <button 
+            className="btn btn-success w-100 mb-2" 
+            onClick={addToCart} 
+            disabled={count === 0 || isOutOfStock}
+          >
+            <i className="bi bi-cart me-2"></i>
+            {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+          
+          <div className="d-flex gap-2">
+            <button
+              className="btn btn-sm btn-outline-primary flex-fill"
+              onClick={() => onEdit(card)}
+            >
+              <i className="bi bi-pencil me-1"></i>Edit
+            </button>
+            <button
+              className="btn btn-sm btn-outline-danger flex-fill"
+              onClick={() => onDelete(card.id)}
+            >
+              <i className="bi bi-trash me-1"></i>Delete
+            </button>
           </div>
-        )}
-        <button className="btn btn-sm btn-success mb-3 w-100" onClick={addToCart} disabled={count === 0 || isOutOfStock}>
-          {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-        </button>
-        <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-sm btn-warning"
-            onClick={() => onEdit(card)}
-          >
-            Edit
-          </button>
-          <button
-            className="btn btn-sm btn-danger"
-            onClick={() => onDelete(card.id)}
-          >
-            Delete
-          </button>
         </div>
       </div>
     </div>

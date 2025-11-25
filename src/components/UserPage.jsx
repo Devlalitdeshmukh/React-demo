@@ -139,237 +139,278 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
   };
 
   return (
-    <div className="container my-4">
+    <div className="container-fluid my-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>User Management</h2>
+        <h2 className="mb-0 text-start">User Management</h2>
         <div className="d-flex gap-2">
           <button className="btn btn-success" onClick={handleExportUsers}>
-            Export CSV
+            <i className="bi bi-download me-2"></i>Export CSV
           </button>
           <button className="btn btn-primary" onClick={() => { setShowUserForm(true); setEditingUser(null); }}>
-            Add New User
+            <i className="bi bi-person-plus me-2"></i>Add New User
           </button>
         </div>
       </div>
 
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <div className="d-flex gap-2">
-          <input 
-            type="text"
-            className="form-control"
-            placeholder="Global Search..."
-            value={searchTerm}
-            onChange={e => handleSearchChange(e.target.value)}
-            style={{ width: '200px' }}
-          />
-        </div>
-        <button
-          className="btn btn-secondary"
-          onClick={() => setIsCardView(prev => !prev)}
-        >
-          Toggle {isCardView ? "Table View" : "Card View"}
-        </button>
-      </div>
-
-      {!isCardView && (
-        <div className="mb-3">
-          <h5>Column Search</h5>
-          <div className="row">
-            <div className="col-md-2">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Search Name..."
-                value={nameSearch}
-                onChange={e => setNameSearch(e.target.value)}
-              />
+      <div className="card shadow-sm mb-4">
+        <div className="card-body">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex gap-2">
+              <div className="input-group" style={{ width: '300px' }}>
+                <span className="input-group-text">
+                  <i className="bi bi-search"></i>
+                </span>
+                <input 
+                  type="text"
+                  className="form-control"
+                  placeholder="Global Search..."
+                  value={searchTerm}
+                  onChange={e => handleSearchChange(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="col-md-2">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Search Email..."
-                value={emailSearch}
-                onChange={e => setEmailSearch(e.target.value)}
-              />
-            </div>
-            <div className="col-md-2">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Search Phone..."
-                value={phoneSearch}
-                onChange={e => setPhoneSearch(e.target.value)}
-              />
-            </div>
-            <div className="col-md-3">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Search Address..."
-                value={addressSearch}
-                onChange={e => setAddressSearch(e.target.value)}
-              />
-            </div>
-            <div className="col-md-2">
-              <input 
-                type="text"
-                className="form-control"
-                placeholder="Search Country..."
-                value={countrySearch}
-                onChange={e => setCountrySearch(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="mt-2">
-            <button className="btn btn-sm btn-outline-primary" onClick={handleColumnSearch}>
-              Search
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => setIsCardView(prev => !prev)}
+            >
+              <i className={`bi ${isCardView ? "bi-table" : "bi-grid"} me-2`}></i>
+              {isCardView ? "Table View" : "Card View"}
             </button>
           </div>
-        </div>
-      )}
 
-      {isCardView ? (
-        <div className="row">
-          {filteredUsers.map(user => (
-            <div key={user.id} className="col-md-6 col-lg-4 mb-4">
-              <div className="card">
-                <div className="card-body">
-                  <div className="d-flex align-items-center mb-3">
-                    {user.image ? (
-                      <img 
-                        src={user.image} 
-                        alt={user.name} 
-                        style={{ 
-                          width: '60px', 
-                          height: '60px', 
-                          objectFit: 'cover',
-                          borderRadius: '50%',
-                          marginRight: '15px'
-                        }} 
-                      />
-                    ) : (
-                      <div className="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" 
-                           style={{ width: '60px', height: '60px' }}>
-                        <span className="fw-bold">{user.name.charAt(0)}</span>
-                      </div>
-                    )}
-                    <div style={{ textAlign: 'left' }}>
-                      <h5 className="card-title mb-0" style={{ textAlign: 'left' }}>{user.name}</h5>
-                      <p className="card-text text-muted mb-0" style={{ textAlign: 'left' }}>{user.email}</p>
-                    </div>
-                  </div>
-                  <p className="card-text" style={{ textAlign: 'left' }}>
-                    <strong>Phone:</strong> {user.phone}<br />
-                    <strong>Address:</strong> {user.address}<br />
-                    <strong>Country:</strong> {user.country}<br />
-                    <strong>Status:</strong> 
-                    <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
-                      {user.status || 'Active'}
-                    </span>
-                  </p>
-                  <div className="d-flex justify-content-between">
-                    <button
-                      className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
-                      onClick={() => toggleUserStatus(user.id)}
-                    >
-                      {user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <div>
-                      <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => handleEditUser(user)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
+          {!isCardView && (
+            <div className="mb-3">
+              <h5 className="mb-3 text-start">Column Search</h5>
+              <div className="row g-2">
+                <div className="col-md-2">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Name..."
+                    value={nameSearch}
+                    onChange={e => setNameSearch(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-2">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Email..."
+                    value={emailSearch}
+                    onChange={e => setEmailSearch(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-2">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Phone..."
+                    value={phoneSearch}
+                    onChange={e => setPhoneSearch(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Address..."
+                    value={addressSearch}
+                    onChange={e => setAddressSearch(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-2">
+                  <input 
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Country..."
+                    value={countrySearch}
+                    onChange={e => setCountrySearch(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-1">
+                  <button className="btn btn-primary w-100" onClick={handleColumnSearch}>
+                    <i className="bi bi-search"></i>
+                  </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          <h3 className="mt-3">Users Table View</h3>
-          <table className="table table-striped mt-3">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
-                <th>Country</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+          )}
+
+          {isCardView ? (
+            <div className="row">
               {currentItems.map(user => (
-                <tr key={user.id}>
-                  <td>{user.name}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone}</td>
-                  <td>{user.address}</td>
-                  <td>{user.country}</td>
-                  <td>
-                    <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
-                      {user.status || 'Active'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="btn-group" role="group">
-                      <button
-                        className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
-                        onClick={() => toggleUserStatus(user.id)}
-                      >
-                        {user.status === 'Active' ? 'Deactivate' : 'Activate'}
-                      </button>
-                      <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => handleEditUser(user)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDeleteUser(user.id)}
-                      >
-                        Delete
-                      </button>
+                <div className="col-lg-4 col-md-6 mb-4" key={user.id}>
+                  <div className="card h-100 shadow-sm">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
+                        <img 
+                          src={user.image || "https://i.pravatar.cc/150?img=3"} 
+                          className="rounded-circle me-3" 
+                          alt={user.name}
+                          style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                        />
+                        <div>
+                          <h5 className="card-title mb-1 text-start">{user.name}</h5>
+                          <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
+                            {user.status}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mb-2 text-start">
+                        <small className="text-muted text-start">
+                          <i className="bi bi-envelope me-2"></i>
+                          {user.email}
+                        </small>
+                      </div>
+                      <div className="mb-2 text-start">
+                        <small className="text-muted text-start">
+                          <i className="bi bi-telephone me-2"></i>
+                          {user.phone}
+                        </small>
+                      </div>
+                      <div className="mb-2 text-start">
+                        <small className="text-muted text-start">
+                          <i className="bi bi-geo-alt me-2"></i>
+                          {user.address}, {user.country}
+                        </small>
+                      </div>
                     </div>
-                  </td>
-                </tr>
+                    <div className="card-footer bg-white">
+                      <div className="d-flex justify-content-between">
+                        <button 
+                          className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
+                          onClick={() => toggleUserStatus(user.id)}
+                        >
+                          <i className={`bi ${user.status === 'Active' ? 'bi-x-circle' : 'bi-check-circle'} me-1`}></i>
+                          {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <div className="btn-group" role="group">
+                          <button 
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <i className="bi bi-pencil"></i>
+                          </button>
+                          <button 
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-          
-          {/* Pagination controls */}
+              {/* Add empty columns to maintain grid structure when there are fewer items */}
+              {currentItems.length > 0 && currentItems.length < 3 && Array.from({ length: 3 - currentItems.length }).map((_, index) => (
+                <div className="col-lg-4 col-md-6 mb-4" key={`empty-${index}`}>
+                  <div className="card h-100 shadow-sm" style={{ visibility: 'hidden' }}>
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
+                        <div style={{ width: '60px', height: '60px' }}></div>
+                        <div>
+                          <h5 className="card-title mb-1">Placeholder</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-hover">
+                <thead className="table-light">
+                  <tr>
+                    <th scope="col" className="text-start">#</th>
+                    <th scope="col" className="text-start">Name</th>
+                    <th scope="col" className="text-start">Email</th>
+                    <th scope="col" className="text-start">Phone</th>
+                    <th scope="col" className="text-start">Address</th>
+                    <th scope="col" className="text-start">Country</th>
+                    <th scope="col" className="text-start">Status</th>
+                    <th scope="col" className="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((user, index) => (
+                    <tr key={user.id}>
+                      <td className="text-start">{indexOfFirstItem + index + 1}</td>
+                      <td className="text-start">
+                        <div className="d-flex align-items-center">
+                          <img 
+                            src={user.image || "https://i.pravatar.cc/150?img=3"} 
+                            className="rounded-circle me-2" 
+                            alt={user.name}
+                            style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                          />
+                          {user.name}
+                        </div>
+                      </td>
+                      <td className="text-start">{user.email}</td>
+                      <td className="text-start">{user.phone}</td>
+                      <td className="text-start">{user.address}</td>
+                      <td className="text-start">{user.country}</td>
+                      <td className="text-start">
+                        <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="text-end">
+                        <div className="btn-group" role="group">
+                          <button 
+                            className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
+                            onClick={() => toggleUserStatus(user.id)}
+                          >
+                            <i className={`bi ${user.status === 'Active' ? 'bi-x-circle' : 'bi-check-circle'} me-1`}></i>
+                            {user.status === 'Active' ? 'Deactivate' : 'Activate'}
+                          </button>
+                          <button 
+                            className="btn btn-sm btn-outline-primary"
+                            onClick={() => handleEditUser(user)}
+                          >
+                            <i className="bi bi-pencil me-1"></i>Edit
+                          </button>
+                          <button 
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            <i className="bi bi-trash me-1"></i>Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Pagination */}
           {totalPages > 1 && (
-            <nav>
-              <ul className="pagination justify-content-center">
+            <nav aria-label="User pagination">
+              <ul className="pagination justify-content-center mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                   <button 
                     className="page-link" 
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   >
-                    Previous
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
                 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
-                  <li key={pageNumber} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <li 
+                    key={page} 
+                    className={`page-item ${currentPage === page ? 'active' : ''}`}
+                  >
                     <button 
                       className="page-link" 
-                      onClick={() => setCurrentPage(pageNumber)}
+                      onClick={() => setCurrentPage(page)}
                     >
-                      {pageNumber}
+                      {page}
                     </button>
                   </li>
                 ))}
@@ -379,28 +420,52 @@ function UserPage({ users, setUsers, toastMessage, setToastMessage }) {
                     className="page-link" 
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   >
-                    Next
+                    <i className="bi bi-chevron-right"></i>
                   </button>
                 </li>
               </ul>
             </nav>
           )}
-        </>
+        </div>
+      </div>
+
+      {/* User Form Modal */}
+      {showUserForm && (
+        <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+          <div className="modal-dialog modal-lg" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title text-start">
+                  {editingUser ? 'Edit User' : 'Add New User'}
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => {
+                    setShowUserForm(false);
+                    setEditingUser(null);
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <UserForm 
+                  user={editingUser} 
+                  onSave={editingUser ? handleUpdateUser : handleAddUser}
+                  onCancel={() => {
+                    setShowUserForm(false);
+                    setEditingUser(null);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
-      <UserForm
-        show={showUserForm}
-        onClose={() => {
-          setShowUserForm(false);
-          setEditingUser(null);
-        }}
-        onAdd={handleAddUser}
-        onUpdate={handleUpdateUser}
-        editUser={editingUser}
-      />
-      
+      {/* Delete Confirmation Modal */}
       <CustomConfirmModal
         show={showDeleteModal}
+        title="Confirm Delete"
         message="Are you sure you want to delete this user?"
         onConfirm={confirmDelete}
         onCancel={cancelDelete}

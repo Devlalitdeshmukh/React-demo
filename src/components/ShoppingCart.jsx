@@ -9,13 +9,12 @@ function ShoppingCart({ cart, updateCartQuantity, removeFromCart, getTotalCartPr
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div className="position-relative">
       <button 
         className="btn btn-primary position-relative"
         onClick={() => setShowCart(!showCart)}
-        style={{ minWidth: '100px' }}
       >
-        Cart
+        <i className="bi bi-cart me-2"></i>Cart
         {getTotalCartItems() > 0 && (
           <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             {getTotalCartItems()}
@@ -27,95 +26,81 @@ function ShoppingCart({ cart, updateCartQuantity, removeFromCart, getTotalCartPr
       {/* Cart Dropdown */}
       {showCart && (
         <div 
+          className="card shadow-lg"
           style={{
             position: 'absolute',
             top: '100%',
             right: 0,
             width: '350px',
-            backgroundColor: 'white',
-            border: '1px solid #ddd',
-            borderRadius: '5px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
             zIndex: 1000,
             maxHeight: '400px',
             overflowY: 'auto'
           }}
         >
-          <div style={{ padding: '15px', borderBottom: '1px solid #eee' }}>
-            <h5>Shopping Cart ({getTotalCartItems()} items)</h5>
+          <div className="card-header bg-primary text-white">
+            <h5 className="mb-0">
+              <i className="bi bi-cart me-2"></i>Shopping Cart
+              <span className="badge bg-light text-dark ms-2">{getTotalCartItems()}</span>
+            </h5>
           </div>
           
           {cart.length === 0 ? (
-            <div style={{ padding: '15px', textAlign: 'center' }}>
-              <p>Your cart is empty</p>
+            <div className="card-body text-center py-4">
+              <i className="bi bi-cart-x text-muted" style={{ fontSize: '3rem' }}></i>
+              <p className="mt-2 mb-0 text-muted">Your cart is empty</p>
             </div>
           ) : (
             <>
-              <div style={{ maxHeight: '250px', overflowY: 'auto' }}>
+              <div className="card-body p-0" style={{ maxHeight: '250px', overflowY: 'auto' }}>
                 {cart.map((item, index) => (
                   <div 
                     key={item.product.id} 
-                    style={{ 
-                      padding: '10px 15px',
-                      borderBottom: index < cart.length - 1 ? '1px solid #eee' : 'none',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
+                    className="border-bottom px-3 py-2"
                   >
-                    <div style={{ flex: '2' }}>
-                      <div><strong>{item.product.title}</strong></div>
-                      <div style={{ fontSize: '0.9em', color: '#666' }}>{item.product.price}</div>
-                    </div>
-                    
-                    <div style={{ 
-                      flex: '1', 
-                      display: 'flex', 
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                      <button 
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => updateCartQuantity(item.product.id, item.count - 1)}
-                        style={{ padding: '2px 8px' }}
-                      >
-                        -
-                      </button>
-                      <span style={{ margin: '0 8px' }}>{item.count}</span>
-                      <button 
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => updateCartQuantity(item.product.id, item.count + 1)}
-                        style={{ padding: '2px 8px' }}
-                      >
-                        +
-                      </button>
-                    </div>
-                    
-                    <div style={{ flex: '1', textAlign: 'right' }}>
-                      <button 
-                        className="btn btn-sm btn-danger"
-                        onClick={() => removeFromCart(item.product.id)}
-                      >
-                        Remove
-                      </button>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="flex-grow-1">
+                        <div className="fw-bold">{item.product.title}</div>
+                        <div className="small text-muted">{item.product.price}</div>
+                      </div>
+                      
+                      <div className="d-flex align-items-center mx-3">
+                        <button 
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => updateCartQuantity(item.product.id, item.count - 1)}
+                        >
+                          <i className="bi bi-dash"></i>
+                        </button>
+                        <span className="mx-2">{item.count}</span>
+                        <button 
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => updateCartQuantity(item.product.id, item.count + 1)}
+                        >
+                          <i className="bi bi-plus"></i>
+                        </button>
+                      </div>
+                      
+                      <div>
+                        <button 
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => removeFromCart(item.product.id)}
+                        >
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
               
-              <div style={{ 
-                padding: '15px', 
-                borderTop: '1px solid #eee',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <div>
-                  <strong>Total: ${getTotalCartPrice()}</strong>
+              <div className="card-footer bg-light">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>Total: ${getTotalCartPrice()}</strong>
+                  </div>
+                  <button className="btn btn-success btn-sm">
+                    <i className="bi bi-credit-card me-1"></i>Checkout
+                  </button>
                 </div>
-                <button className="btn btn-success btn-sm">
-                  Checkout
-                </button>
               </div>
             </>
           )}

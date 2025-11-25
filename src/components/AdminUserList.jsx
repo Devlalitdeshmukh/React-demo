@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function AdminUserList() {
   // Sample admin users data
@@ -149,42 +149,45 @@ function AdminUserList() {
   };
 
   return (
-    <div className="container my-4">
+    <div className="container-fluid my-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Admin Users</h2>
+        <h2 className="mb-0 text-start">Admin Users</h2>
         <div className="d-flex gap-2">
           <button className="btn btn-success" onClick={handleExportAdminUsers}>
-            Export CSV
+            <i className="bi bi-download me-2"></i>Export CSV
           </button>
           <button className="btn btn-primary" onClick={() => setShowAddForm(true)}>
-            Add New Admin
+            <i className="bi bi-person-plus me-2"></i>Add New Admin
           </button>
         </div>
       </div>
 
       {/* Search Bar */}
       <div className="mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search admin users..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="input-group" style={{ width: '300px' }}>
+          <span className="input-group-text">
+            <i className="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search admin users..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       {showAddForm && (
-        <div className="card mb-4">
-          <div className="card-header">
-            <h5>Add New Admin User</h5>
+        <div className="card mb-4 shadow-sm">
+          <div className="card-header bg-white">
+            <h5 className="mb-0 text-start">Add New Admin User</h5>
           </div>
           <div className="card-body">
             <form onSubmit={handleAddAdmin}>
               <div className="row">
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="name" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Full Name
-                  </label>
+                <div className="col-md-4 mb-3 text-start">
+                  <label htmlFor="name" className="form-label text-start">Full Name</label>
                   <input
                     type="text"
                     className={`form-control ${errors.name ? 'is-invalid' : ''}`}
@@ -197,10 +200,8 @@ function AdminUserList() {
                   {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
                 
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="email" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Email Address
-                  </label>
+                <div className="col-md-4 mb-3 text-start">
+                  <label htmlFor="email" className="form-label text-start">Email Address</label>
                   <input
                     type="email"
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
@@ -213,10 +214,8 @@ function AdminUserList() {
                   {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
                 
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="role" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Role
-                  </label>
+                <div className="col-md-4 mb-3 text-start">
+                  <label htmlFor="role" className="form-label text-start">Role</label>
                   <select
                     className="form-select"
                     id="role"
@@ -232,14 +231,14 @@ function AdminUserList() {
               
               <div className="d-flex gap-2">
                 <button type="submit" className="btn btn-success">
-                  Add Admin
+                  <i className="bi bi-person-plus me-2"></i>Add Admin
                 </button>
                 <button type="button" className="btn btn-secondary" onClick={() => {
                   setShowAddForm(false);
                   setNewAdmin({ name: '', email: '', role: 'Admin' });
                   setErrors({});
                 }}>
-                  Cancel
+                  <i className="bi bi-x-circle me-2"></i>Cancel
                 </button>
               </div>
             </form>
@@ -247,10 +246,10 @@ function AdminUserList() {
         </div>
       )}
 
-      <div className="card">
+      <div className="card shadow-sm">
         <div className="card-body">
           <div className="table-responsive">
-            <table className="table table-striped table-hover">
+            <table className="table table-hover">
               <thead className="table-light">
                 <tr>
                   <th>ID</th>
@@ -259,7 +258,7 @@ function AdminUserList() {
                   <th>Role</th>
                   <th>Last Login</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th className="text-end">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,27 +267,30 @@ function AdminUserList() {
                     <td>{user.id}</td>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
-                    <td>{user.role}</td>
+                    <td>
+                      <span className="badge bg-primary">{user.role}</span>
+                    </td>
                     <td>{user.lastLogin}</td>
                     <td>
                       <span className={`badge ${user.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
                         {user.status}
                       </span>
                     </td>
-                    <td>
+                    <td className="text-end">
                       <div className="btn-group" role="group">
                         <button
                           className={`btn btn-sm ${user.status === 'Active' ? 'btn-warning' : 'btn-success'}`}
                           onClick={() => toggleUserStatus(user.id)}
                         >
+                          <i className={`bi ${user.status === 'Active' ? 'bi-x-circle' : 'bi-check-circle'} me-1`}></i>
                           {user.status === 'Active' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button
-                          className="btn btn-sm btn-danger"
+                          className="btn btn-sm btn-outline-danger"
                           onClick={() => handleDeleteAdmin(user.id)}
                           disabled={user.id === 1}
                         >
-                          Delete
+                          <i className="bi bi-trash me-1"></i>Delete
                         </button>
                       </div>
                     </td>
@@ -306,7 +308,7 @@ function AdminUserList() {
           <div className="modal-dialog" role="document">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Confirm Delete</h5>
+                <h5 className="modal-title text-start">Confirm Delete</h5>
                 <button type="button" className="btn-close" onClick={cancelDelete}></button>
               </div>
               <div className="modal-body">
@@ -314,10 +316,10 @@ function AdminUserList() {
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={cancelDelete}>
-                  Cancel
+                  <i className="bi bi-x-circle me-2"></i>Cancel
                 </button>
                 <button type="button" className="btn btn-danger" onClick={confirmDelete}>
-                  Delete
+                  <i className="bi bi-trash me-2"></i>Delete
                 </button>
               </div>
             </div>

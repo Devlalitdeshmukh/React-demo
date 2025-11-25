@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Signup({ onSignup }) {
   const [user, setUser] = useState({
@@ -93,12 +93,22 @@ function Signup({ onSignup }) {
 
   if (signupSuccess) {
     return (
-      <div className="container mt-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-            <div className="alert alert-success text-center" role="alert">
-              <h4>Account created successfully!</h4>
-              <p>Redirecting to login page...</p>
+      <div className="container-fluid vh-100 d-flex align-items-center py-5">
+        <div className="row w-100 justify-content-center">
+          <div className="col-lg-4 col-md-6">
+            <div className="card shadow-lg border-0 rounded-3">
+              <div className="card-body p-5 text-center">
+                <div className="mb-4 text-success">
+                  <i className="bi bi-check-circle-fill" style={{fontSize: '4rem'}}></i>
+                </div>
+                <h3 className="fw-bold mb-3">Account Created Successfully!</h3>
+                <p className="text-muted">
+                  Redirecting to login page...
+                </p>
+                <div className="progress mt-4" style={{height: '5px'}}>
+                  <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style={{width: '100%'}}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -107,98 +117,121 @@ function Signup({ onSignup }) {
   }
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="text-center">Sign Up</h3>
-            </div>
-            <div className="card-body">
+    <div className="container-fluid vh-100 d-flex align-items-center py-5">
+      <div className="row w-100 justify-content-center">
+        <div className="col-lg-4 col-md-6">
+          <div className="card shadow-lg border-0 rounded-3">
+            <div className="card-body p-5">
+              <div className="text-center mb-4">
+                <div className="mb-3">
+                  <i className="bi bi-building text-primary" style={{fontSize: '3rem'}}></i>
+                </div>
+                <h2 className="fw-bold text-center">Create Account</h2>
+                <p className="text-muted">Fill in the information below</p>
+              </div>
+              
               {signupError && (
-                <div className="alert alert-danger" role="alert">
+                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                  <i className="bi bi-exclamation-triangle-fill me-2"></i>
                   {signupError}
+                  <button type="button" className="btn-close" onClick={() => setSignupError('')}></button>
                 </div>
               )}
               
               <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="name" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                    id="name"
-                    name="name"
-                    value={user.name}
-                    onChange={handleInputChange}
-                    placeholder="Enter your full name"
-                  />
+                <div className="mb-3 text-start">
+                  <label htmlFor="name" className="form-label text-start">Full Name</label>
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <i className="bi bi-person"></i>
+                    </span>
+                    <input
+                      type="text"
+                      className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                      id="name"
+                      name="name"
+                      value={user.name}
+                      onChange={handleInputChange}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
                   {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                 </div>
                 
-                <div className="mb-3">
-                  <label htmlFor="email" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    id="email"
-                    name="email"
-                    value={user.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                  />
+                <div className="mb-3 text-start">
+                  <label htmlFor="email" className="form-label text-start">Email Address</label>
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <i className="bi bi-envelope"></i>
+                    </span>
+                    <input
+                      type="email"
+                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                      id="email"
+                      name="email"
+                      value={user.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email"
+                    />
+                  </div>
                   {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
                 
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-                    id="password"
-                    name="password"
-                    value={user.password}
-                    onChange={handleInputChange}
-                    placeholder="Enter your password"
-                  />
+                <div className="mb-3 text-start">
+                  <label htmlFor="password" className="form-label text-start">Password</label>
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <i className="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                      id="password"
+                      name="password"
+                      value={user.password}
+                      onChange={handleInputChange}
+                      placeholder="Enter your password"
+                    />
+                  </div>
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
                 
-                <div className="mb-3">
-                  <label htmlFor="confirmPassword" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    value={user.confirmPassword}
-                    onChange={handleInputChange}
-                    placeholder="Confirm your password"
-                  />
+                <div className="mb-3 text-start">
+                  <label htmlFor="confirmPassword" className="form-label text-start">Confirm Password</label>
+                  <div className="input-group">
+                    <span className="input-group-text">
+                      <i className="bi bi-lock-fill"></i>
+                    </span>
+                    <input
+                      type="password"
+                      className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      value={user.confirmPassword}
+                      onChange={handleInputChange}
+                      placeholder="Confirm your password"
+                    />
+                  </div>
                   {errors.confirmPassword && <div className="invalid-feedback">{errors.confirmPassword}</div>}
                 </div>
                 
-                <div className="d-grid">
-                  <button type="submit" className="btn btn-primary">
-                    Sign Up
+                <div className="d-grid mb-3">
+                  <button type="submit" className="btn btn-primary btn-lg">
+                    <i className="bi bi-person-plus me-2"></i>Create Account
                   </button>
                 </div>
               </form>
               
-              <div className="text-center mt-3">
-                <p>
-                  Already have an account? <a href="/login">Login here</a>
+              <div className="text-center">
+                <p className="mb-0">
+                  Already have an account? <Link to="/login" className="text-decoration-none">Sign In</Link>
                 </p>
               </div>
             </div>
+          </div>
+          
+          <div className="text-center mt-4 text-muted">
+            <small>© {new Date().getFullYear()} Vendor Portal. All rights reserved.</small>
           </div>
         </div>
       </div>

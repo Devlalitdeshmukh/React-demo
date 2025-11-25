@@ -1,4 +1,5 @@
 import './App.css';
+import './components/Theme.css';
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './components/HomePage';
@@ -9,7 +10,14 @@ import Footer from './components/Footer';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import AdminUserList from './components/AdminUserList';
+import TextForm from './components/TextForm';
+import CompanyUserList from './components/CompanyUserList';
+import CompanyUserDetail from './components/CompanyUserDetail';
+import UserProfile from './components/UserProfile';
 import React from 'react';
+
+// Import Bootstrap Icons CSS
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function App() {
   const [cards, setCards] = useState([
@@ -55,6 +63,9 @@ function App() {
     }
   ]);
 
+  // Cart state
+  const [cart, setCart] = useState([]);
+
   // Users state
   const [users, setUsers] = useState([
     {
@@ -96,11 +107,13 @@ function App() {
     { email: 'admin@example.com', password: 'admin123' } // Default admin credentials
   ]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Check if user is logged in from localStorage
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
     const savedCredentials = localStorage.getItem('userCredentials');
+    const savedTheme = localStorage.getItem('theme');
     
     if (savedUser) {
       try {
@@ -126,7 +139,24 @@ function App() {
         setUserCredentials([{ email: 'admin@example.com', password: 'admin123' }]);
       }
     }
+    
+    // Set theme
+    if (savedTheme === 'dark') {
+      setIsDarkMode(true);
+      document.body.classList.add('dark-mode');
+    }
   }, []);
+
+  // Apply theme changes
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Auto-hide toast messages after 5 seconds
   useEffect(() => {
@@ -210,6 +240,10 @@ function App() {
     setShowLogoutModal(false);
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
   // Protected route component
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
@@ -224,25 +258,14 @@ function App() {
         {currentUser && <Navigation onLogout={handleLogout} currentUser={currentUser} />}
         <Routes>
           <Route path="/login" element={
-            currentUser ? <Navigate to="/products" replace /> : <Login onLogin={handleLogin} />
+            currentUser ? <Navigate to="/users" replace /> : <Login onLogin={handleLogin} />
           } />
           <Route path="/signup" element={
-            currentUser ? <Navigate to="/products" replace /> : <Signup onSignup={handleSignup} />
+            currentUser ? <Navigate to="/users" replace /> : <Signup onSignup={handleSignup} />
           } />
           <Route path="/" element={
             <ProtectedRoute>
               <HomePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/products" element={
-            <ProtectedRoute>
-              <ProductPage 
-                cards={cards} 
-                setCards={setCards} 
-                toastMessage={toastMessage} 
-                setToastMessage={setToastMessage} 
-                users={users}
-              />
             </ProtectedRoute>
           } />
           <Route path="/users" element={
@@ -255,9 +278,42 @@ function App() {
               />
             </ProtectedRoute>
           } />
+          <Route path="/products" element={
+            <ProtectedRoute>
+              <ProductPage 
+                cards={cards} 
+                setCards={setCards} 
+                cart={cart}
+                setCart={setCart}
+                toastMessage={toastMessage} 
+                setToastMessage={setToastMessage} 
+                users={users}
+              />
+            </ProtectedRoute>
+          } />
           <Route path="/admin-users" element={
             <ProtectedRoute>
               <AdminUserList />
+            </ProtectedRoute>
+          } />
+          <Route path="/text-form" element={
+            <ProtectedRoute>
+              <TextForm />
+            </ProtectedRoute>
+          } />
+          <Route path="/company-users" element={
+            <ProtectedRoute>
+              <CompanyUserList />
+            </ProtectedRoute>
+          } />
+          <Route path="/company-users/:id" element={
+            <ProtectedRoute>
+              <CompanyUserDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <UserProfile currentUser={currentUser} onThemeToggle={toggleTheme} isDarkMode={isDarkMode} />
             </ProtectedRoute>
           } />
         </Routes>
@@ -291,7 +347,7 @@ function App() {
             <div className="modal-dialog" role="document">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Confirm Logout</h5>
+                  <h5 className="modal-title text-start">Confirm Logout</h5>
                   <button type="button" className="btn-close" onClick={cancelLogout}></button>
                 </div>
                 <div className="modal-body">

@@ -55,90 +55,114 @@ function AddCardForm({ show, onClose, onAdd, editCard, onUpdate }) {
       style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
     >
       <div className="modal-dialog modal-dialog-centered" role="document">
-        <div className="modal-content custom-modal">
+        <div className="modal-content">
           <form onSubmit={handleSubmit}>
-            <div className="modal-header">
-              <h5 className="modal-title">{editCard ? "Edit Card" : "Add New Card"}</h5>
+            <div className="modal-header bg-primary text-white">
+              <h5 className="modal-title text-start">
+                <i className={`bi bi-${editCard ? 'pencil' : 'plus-circle'} me-2`}></i>
+                {editCard ? "Edit Product" : "Add New Product"}
+              </h5>
               <button
                 type="button"
-                className="btn-close"
+                className="btn-close btn-close-white"
                 aria-label="Close"
                 onClick={onClose}
               ></button>
             </div>
             <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="titleInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                  Title
-                </label>
-                <input
-                  id="titleInput"
-                  type="text"
-                  className="form-control"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
+              <div className="mb-3 text-start">
+                <label htmlFor="titleInput" className="form-label text-start">Title</label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bi bi-tag"></i>
+                  </span>
+                  <input
+                    id="titleInput"
+                    type="text"
+                    className="form-control"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                    placeholder="Enter product title"
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="priceInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                  Price
-                </label>
-                <input
-                  id="priceInput"
-                  type="text"
-                  className="form-control"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                />
+              <div className="mb-3 text-start">
+                <label htmlFor="priceInput" className="form-label text-start">Price</label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bi bi-currency-dollar"></i>
+                  </span>
+                  <input
+                    id="priceInput"
+                    type="text"
+                    className="form-control"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                    placeholder="Enter price (e.g., $99.99)"
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="descInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                  Description
-                </label>
-                <textarea
-                  id="descInput"
-                  className="form-control"
-                  value={desc}
-                  onChange={(e) => setDesc(e.target.value)}
-                  required
-                ></textarea>
+              <div className="mb-3 text-start">
+                <label htmlFor="descInput" className="form-label text-start">Description</label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bi bi-card-text"></i>
+                  </span>
+                  <textarea
+                    id="descInput"
+                    className="form-control"
+                    value={desc}
+                    onChange={(e) => setDesc(e.target.value)}
+                    required
+                    rows="3"
+                    placeholder="Enter product description"
+                  ></textarea>
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="quantityInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                  Quantity
-                </label>
-                <input
-                  id="quantityInput"
-                  type="number"
-                  className="form-control"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
-                  min="0"
-                  required
-                />
+              <div className="mb-3 text-start">
+                <label htmlFor="quantityInput" className="form-label text-start">Quantity</label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bi bi-archive"></i>
+                  </span>
+                  <input
+                    id="quantityInput"
+                    type="number"
+                    className="form-control"
+                    value={quantity}
+                    onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+                    min="0"
+                    required
+                    placeholder="Enter quantity"
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label htmlFor="imageInput" className="form-label" style={{ textAlign: 'left', display: 'block' }}>
-                  Image URL (optional)
-                </label>
-                <input
-                  id="imageInput"
-                  type="text"
-                  className="form-control"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="Enter image URL"
-                />
+              <div className="mb-3 text-start">
+                <label htmlFor="imageInput" className="form-label text-start">Image URL (optional)</label>
+                <div className="input-group">
+                  <span className="input-group-text">
+                    <i className="bi bi-image"></i>
+                  </span>
+                  <input
+                    id="imageInput"
+                    type="text"
+                    className="form-control"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    placeholder="Enter image URL"
+                  />
+                </div>
               </div>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Close
+                <i className="bi bi-x-circle me-2"></i>Cancel
               </button>
               <button type="submit" className="btn btn-primary">
-                {editCard ? "Update Card" : "Add Card"}
+                <i className="bi bi-check-circle me-2"></i>
+                {editCard ? "Update Product" : "Add Product"}
               </button>
             </div>
           </form>
